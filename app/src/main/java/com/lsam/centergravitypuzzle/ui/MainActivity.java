@@ -1,23 +1,62 @@
 package com.lsam.centergravitypuzzle.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import java.util.Random;
+import com.lsam.centergravitypuzzle.core.TurnEngine;
 
-import com.lsam.centergravitypuzzle.core.Board;
-import com.lsam.centergravitypuzzle.core.Gravity;
+public class MainActivity extends Activity {
 
-public class MainActivity extends AppCompatActivity {
+    private TurnEngine engine;
+    private TextView status;
+    private GameView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 仮ロジック確認（UIは次フェーズ）
-        Board board = new Board(new Random(0), 5);
-        Gravity.apply(board);
+        engine = new TurnEngine(0);
 
-        // 画面はまだ空でOK
+        status = new TextView(this);
+        Button reset = new Button(this);
+        reset.setText("RESET");
+
+        view = new GameView(this);
+        view.bind(engine.getBoard(), (x, y) -> {
+            engine.applyTurn(x, y);
+            view.invalidate();
+            refresh();
+        });
+
+        reset.setOnClickListener(v -> {
+            engine.reset();
+            view.invalidate();
+            refresh();
+        });
+
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.addView(status);
+        root.addView(reset);
+        root.addView(view,
+            new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0, 1f
+            )
+        );
+
+        setContentView(root);
+        refresh();
+    }
+
+    private void refresh() {
+        String mode = (engine.getTurn() < 10) ? "Tutorial" : "Normal";
+        String s = "Turn: " + engine.getTurn()
+                 + " / Mode: " + mode
+                 + " / State: " + engine.getState();
+        status.setText(s);
     }
 }

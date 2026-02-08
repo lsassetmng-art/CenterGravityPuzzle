@@ -3,52 +3,60 @@ package com.lsam.centergravitypuzzle.core;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * 縦・横 3個以上の消去判定
- */
 public class MatchResolver {
 
     public static boolean resolve(Board board) {
-        Set<String> remove = new HashSet<>();
+        Set<Long> remove = new HashSet<>();
 
-        // 横方向
+        // horizontal
         for (int y = 0; y < Board.SIZE; y++) {
-            for (int x = 0; x < Board.SIZE - 2; x++) {
-                int v = board.get(x, y);
-                if (v != Board.EMPTY &&
-                    v == board.get(x + 1, y) &&
-                    v == board.get(x + 2, y)) {
-                    remove.add(x + "," + y);
-                    remove.add((x + 1) + "," + y);
-                    remove.add((x + 2) + "," + y);
+            int run = 1;
+            for (int x = 1; x <= Board.SIZE; x++) {
+                int prev = board.get(x - 1, y);
+                int curr = (x < Board.SIZE) ? board.get(x, y) : Board.EMPTY;
+                if (prev != Board.EMPTY && prev == curr) {
+                    run++;
+                } else {
+                    if (prev != Board.EMPTY && run >= 3) {
+                        for (int i = 0; i < run; i++) {
+                            remove.add(key(x - 1 - i, y));
+                        }
+                    }
+                    run = 1;
                 }
             }
         }
 
-        // 縦方向
+        // vertical
         for (int x = 0; x < Board.SIZE; x++) {
-            for (int y = 0; y < Board.SIZE - 2; y++) {
-                int v = board.get(x, y);
-                if (v != Board.EMPTY &&
-                    v == board.get(x, y + 1) &&
-                    v == board.get(x, y + 2)) {
-                    remove.add(x + "," + y);
-                    remove.add(x + "," + (y + 1));
-                    remove.add(x + "," + (y + 2));
+            int run = 1;
+            for (int y = 1; y <= Board.SIZE; y++) {
+                int prev = board.get(x, y - 1);
+                int curr = (y < Board.SIZE) ? board.get(x, y) : Board.EMPTY;
+                if (prev != Board.EMPTY && prev == curr) {
+                    run++;
+                } else {
+                    if (prev != Board.EMPTY && run >= 3) {
+                        for (int i = 0; i < run; i++) {
+                            remove.add(key(x, y - 1 - i));
+                        }
+                    }
+                    run = 1;
                 }
             }
         }
 
-        // 消去
-        for (String key : remove) {
-            String[] p = key.split(",");
-            board.set(
-                Integer.parseInt(p[0]),
-                Integer.parseInt(p[1]),
-                Board.EMPTY
-            );
-        }
+        if (remove.isEmpty()) return false;
 
-        return !remove.isEmpty();
+        for (long k : remove) {
+            int x = (int)(k >>> 32);
+            int y = (int)k;
+            board.set(x, y, Board.EMPTY);
+        }
+        return true;
+    }
+
+    private static long key(int x, int y) {
+        return (((long)x) << 32) | (y & 0xffffffffL);
     }
 }
