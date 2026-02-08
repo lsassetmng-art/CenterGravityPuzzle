@@ -1,0 +1,25 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace "com.lsam.centergravitypuzzle"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.lsam.centergravitypuzzle"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "0.1"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+}
