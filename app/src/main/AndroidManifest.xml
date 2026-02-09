@@ -16,5 +16,26 @@
             </intent-filter>
         </activity>
 
+        <!-- ========================================= -->
+        <!-- Phase5〜公開直前：追加 Activity 定義 -->
+        <!-- ========================================= -->
+
+        <activity
+            android:name=".TitleActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".GameActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".HowToPlayActivity"
+            android:exported="false" />
+
     </application>
 </manifest>
